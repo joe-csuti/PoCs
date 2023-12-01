@@ -1,0 +1,75 @@
+version: '2'
+
+networks:
+  kafka_network:
+    name: kafka_network
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    container_name: kafka_zookeeper
+    networks: 
+      - kafka_network
+    ports:
+      - 22181:2181
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+
+  zookeeper_frontend:
+    image: elkozmon/zoonavigator:latest
+    container_name: kafka_zookeeper_fr
+    networks: 
+      - kafka_network
+    ports:
+      - 22000:9000
+    environment:
+      HTTP_PORT: 9000
+      CONNECTION_KAFKAZOOKEEPER_CONN: kafka_zookeeper:2181
+      AUTO_CONNECT_CONNECTION_ID: KAFKAZOOKEEPER
+
+  kafka-1:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka_node_1
+    depends_on:
+      - zookeeper
+    networks: 
+      - kafka_network
+    ports:
+      - 29092:29092
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_BROKER_ID: 0 # The broker.id property is the unique and permanent name of each node in the cluster.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # The replication factor for the offsets topic (set higher to ensure availability). To ensure that the effective replication factor of the offsets topic is the configured value, the number of alive brokers has to be at least the replication factor at the time of the first request for the offsets topic. If not, either the offsets topic creation will fail or it will get a replication factor of min(alive brokers, configured replication factor).
+
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29092
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL # Kafka brokers communicate between themselves, usually on the internal network (e.g., Docker network, AWS VPC, etc.). To define which listener to use, specify KAFKA_INTER_BROKER_LISTENER_NAME(inter.broker.listener.name). The host/IP used must be accessible from the broker machine to others.
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka_node_1:9092,EXTERNAL://localhost:29092 # Listeners to publish to ZooKeeper for clients to use, if different than the listeners config property.
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+  kafka-2:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka_node_2
+    depends_on:
+      - zookeeper
+    networks: 
+      - kafka_network
+    ports:
+      - 29093:29093
+    environment:
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_BROKER_ID: 1 # The broker.id property is the unique and permanent name of each node in the cluster.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1 # The replication factor for the offsets topic (set higher to ensure availability). To ensure that the effective replication factor of the offsets topic is the configured value, the number of alive brokers has to be at least the replication factor at the time of the first request for the offsets topic. If not, either the offsets topic creation will fail or it will get a replication factor of min(alive brokers, configured replication factor).
+
+      KAFKA_LISTENERS: INTERNAL://:9092,EXTERNAL://:29093
+      KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL # Kafka brokers communicate between themselves, usually on the internal network (e.g., Docker network, AWS VPC, etc.). To define which listener to use, specify KAFKA_INTER_BROKER_LISTENER_NAME(inter.broker.listener.name). The host/IP used must be accessible from the broker machine to others.
+      KAFKA_ADVERTISED_LISTENERS: INTERNAL://kafka_node_2:9092,EXTERNAL://localhost:29093 # Listeners to publish to ZooKeeper for clients to use, if different than the listeners config property.
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: INTERNAL:PLAINTEXT,EXTERNAL:PLAINTEXT
+
+      # Example:
+      # ALLOW_PLAINTEXT_LISTENER=no
+      # KAFKA_LISTENERS=ISSL://kafka1:9092,OSSL://kafka1:29092
+      # KAFKA_ADVERTISED_LISTENERS=ISSL://kafka1:9092,OSSL://localhost:29092
+      # KAFKA_INTER_BROKER_LISTENER_NAME=ISSL
+      # KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=ISSL:SSL,OSSL:SSL
+      # KAFKA_SSL_CLIENT_AUTH=required

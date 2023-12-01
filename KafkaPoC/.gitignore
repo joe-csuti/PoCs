@@ -1,0 +1,30 @@
+# Eclipse
+.classpath
+.project
+.settings/
+.metadata/
+.factorypath
+
+# Intellij
+.mvn/
+.idea/
+*.iml
+*.iws
+*.ipr
+
+# Mac
+.DS_Store
+
+# Maven
+log/
+target/
+
+*.orig
+*.fo
+
+
+**/.vscode
+**/.attach_pid*
+.jpb/
+
+build/analysis

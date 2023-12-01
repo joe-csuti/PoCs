@@ -1,0 +1,15 @@
+logging:
+  config: classpath:logback-config.xml
+
+spring:
+  kafka:
+    streams:
+      replication-factor: 2
+      application-id: TEST # https://kafka.apache.org/21/documentation/streams/developer-guide/config-streams#application-id
+#    bootstrap-servers: localhost:29092, localhost:29093
+    bootstrap-servers: localhost:29095, localhost:29096
+
+project:
+  topic: test_topic
+  stream-topic: test_stream_topic
+  stream-output-topic: test_stream_output_topic

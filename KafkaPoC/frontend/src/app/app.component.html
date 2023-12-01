@@ -1,0 +1,71 @@
+<div class="container">
+    <div class="panel">
+        <div class="producer">
+            <b>Producer:</b>
+            <div class="input">
+                <input [(ngModel)]="messageSendToTest" type="text"/>
+            </div>
+            <div class="buttons">
+                <button (click)="sendSync()">
+                    Send sync
+                </button>
+                <button (click)="sendAsync()">
+                    Send async
+                </button>
+            </div>
+        </div>
+        <div>
+            <b>Consumer:</b>
+            <div class="output big">
+                <div *ngFor="let msg of messagesReceivedFromTest">{{msg}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="producer">
+            <b>Stream producer:</b>
+            <div class="input">
+                <input [(ngModel)]="messageSendToTestStream" type="text"/>
+            </div>
+            <div class="buttons">
+                <button (click)="sendStream()">
+                    Send to stream topic
+                </button>
+                <button (click)="sendBulkToStream()">
+                    Send bulk to stream topic
+                </button>
+            </div>
+        </div>
+        <div>
+            <b>Stream consumer:</b>
+            <div class="output">
+                <div *ngFor="let msg of messagesReceivedFromTestStream">{{msg}}</div>
+            </div>
+            <b>Stream filtered consumer:</b>
+            <div class="output">
+                <div *ngFor="let msg of messagesReceivedFromTestStreamOutput">{{msg}}</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="panel">
+        <div class="producer">
+            <b>Filter:</b>
+            <div class="input">
+                <input [(ngModel)]="filter" type="text"/>
+            </div>
+            <div class="buttons only">
+                <button (click)="sendSelect()">
+                    Send filter
+                </button>
+            </div>
+        </div>
+        <div>
+            <b>Stream consumer:</b>
+            <div class="output big">
+                <div *ngFor="let msg of selectResult">{{msg}}</div>
+            </div>
+        </div>
+    </div>
+</div>
